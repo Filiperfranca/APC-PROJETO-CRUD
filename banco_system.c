@@ -12,6 +12,7 @@ int main (void) {
     } transacao;
 
     typedef struct {
+        int id;
         transacao tipo;
         double valor;
         char destino[51];
@@ -61,6 +62,8 @@ int main (void) {
         DEPOSITAR,
         SACAR,
         TRANSFERIR,
+        EDITAR_T,
+        PESQUISAR,
         SAIR
     } menu;
 
@@ -99,7 +102,7 @@ int main (void) {
                 break;
             }
             printf("<JARVIS>: Seu extrato:\n");
-            printf("TIPO    VALOR    DESTINO\n");
+            printf("ID    TIPO    VALOR    DESTINO\n");
             for (int i = 0; i < id_transacao; i++) {
                 char *tipo;
 
@@ -120,7 +123,8 @@ int main (void) {
                     tipo = "DESCONHECIDO";
                     break;
             }
-                printf("%-15s %-10.2lf %s\n", tipo, one.extrato[i].valor, one.extrato[i].destino);
+                printf("%-20s %-15s %-10.2lf %s\n", one.extrato[id_transacao].id, tipo
+                    ,one.extrato[i].valor, one.extrato[i].destino);
             }
             printf("\n");
             break;
@@ -157,6 +161,7 @@ int main (void) {
                 printf("<JARVIS>: TRANSFERENCIA REALIZADA\n");
                 one.saldo -= one.extrato[id_transacao].valor;
                 one.extrato[id_transacao].tipo = TRANSFERENCIA;
+                one.extrato[id_transacao].id = id_transacao;
                 id_transacao++;
             }
             else {
@@ -195,6 +200,7 @@ int main (void) {
                 printf("<JARVIS>: DEPOSITO REALIZADO\n");
                 one.extrato[id_transacao].tipo = DEPOSITO;
                 strcpy(one.extrato[id_transacao].destino, one.nome);
+                one.extrato[id_transacao].id = id_transacao;
                 printf("\n");
                 id_transacao ++;
             }
@@ -235,6 +241,7 @@ int main (void) {
                 one.extrato[id_transacao].tipo = SAQUE;
                 strcpy(one.extrato[id_transacao].destino, one.nome);
                 one.saldo -= one.extrato[id_transacao].valor;
+                one.extrato[id_transacao].id = id_transacao;
                 id_transacao++;
             }
             else {
@@ -243,7 +250,131 @@ int main (void) {
             }
             printf("\n");
             break;
-        
+        case PESQUISAR:
+            printf("\n");
+            printf("<JARVIS>: informe o id da tran-\n");
+            printf("          sação\n");
+            printf("          ID:");
+            int id_pesquisa;
+            if(scanf("%i", &id_pesquisa)!=1) {
+                printf("\n");
+                printf("<JARVIS>: Opa, digite corretamente\n");
+                while (getchar() != '\n');
+                break;
+            }
+            id_pesquisa =fabs(id_pesquisa);
+            if (id_pesquisa > id_transacao)
+            {
+                printf("\n");
+                printf("<JARVIS>: Valor não registrado.\n");
+                while (getchar() != '\n');
+                break;
+            }
+            else {
+                char *tipo;
+                 switch (one.extrato[id_pesquisa].tipo)
+                {
+                    case DEPOSITO:
+                        tipo = "DEPOSITO";
+                        break;
+
+                    case SAQUE:
+                        tipo = "SAQUE";
+                        break;
+
+                    case TRANSFERENCIA:
+                        tipo = "TRANSFERENCIA";
+                        break;
+                    default:
+                        tipo = "DESCONHECIDO";
+                        break;
+                }
+                printf("ID    TIPO    VALOR    DESTINO\n");
+                printf("%-20s %-15s %-10.2lf %s\n", one.extrato[id_pesquisa].id, tipo
+                    ,one.extrato[id_pesquisa].valor, one.extrato[id_pesquisa].destino);
+            }
+            printf("\n");
+            break;
+        case EDITAR_T:
+            printf("\n");
+            printf("<JARVIS>: informe o id da tran-\n");
+            printf("          sação\n");
+            printf("          ID:");
+            int id_pesquisa;
+            if(scanf("%i", &id_pesquisa)!=1) {
+                printf("\n");
+                printf("<JARVIS>: Opa, digite corretamente\n");
+                while (getchar() != '\n');
+                break;
+            }
+            while (getchar() != '\n');
+            id_pesquisa =fabs(id_pesquisa);
+            
+            typedef enum {
+                EDITAR,
+                APAGAR,
+                VOLTAR
+            } menu_edit;
+            int opcao_edit;
+            printf("\n");
+            
+            while (1)
+            {
+                if (scanf("%i", &opcao_edit) != 1) {
+                    printf("OPCAO INVALIDA\n");
+                    while (getchar() != '\n');
+                    printf("\n");
+                    continue;
+                }
+                while (getchar() != '\n');
+
+                switch (opcao_edit)
+                {
+                case EDITAR:
+                    if (one.extrato[id_pesquisa].tipo == SAQUE)
+                    {
+                        printf("<JARVIS>: Edite este saque infor-\n");
+                        printf("          me o valor\n");
+                        printf("          VALOR:");
+                        int temp;
+                        if (temp != 1)
+                        {
+                            printf("\n");
+                            printf("<JARVIS>: Opa, digite corretamente\n");
+                            while (getchar() != '\n');
+                            break;
+                        }
+                        temp = fabs(temp);
+                        if (temp <= one.saldo)
+                        {
+                            printf("\n");
+                            printf("<JARVIS>: SAQUE MODIFICADO\n");
+                            one.saldo += one.extrato[id_pesquisa].valor;
+                            one.saldo -= temp;
+                            one.extrato[id_pesquisa].valor = temp;
+                            printf("\n");
+                            break;
+                        }
+                        else if (one.extrato[id_pesquisa].tipo == TRANSFERENCIA)
+                        {
+                            
+                        }
+                        
+                        
+                    }
+                    
+                    break;
+                
+                default:
+                    printf("\n");
+                    printf("OPCAO INVALIDA\n");
+                    printf("\n");
+                    break;
+                }
+            }
+            
+            
+
         case SAIR:
             printf("\n");
             printf("<JARVIS>: ENCERRANDO SISTEMA\n");
