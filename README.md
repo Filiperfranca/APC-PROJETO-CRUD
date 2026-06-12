@@ -1,84 +1,26 @@
-# 🏦 JARVIS BANK
+# 🏦 JARVIS Bank — Sistema Bancário em C
 
-> Sistema bancário em linguagem C com interface via terminal, assistido pelo JARVIS.
-
----
-
-## 📋 Índice
-
-- [Sobre o Projeto](#sobre-o-projeto)
-- [Funcionalidades](#funcionalidades)
-- [Pré-requisitos](#pré-requisitos)
-- [Como Compilar](#como-compilar)
-- [Como Usar](#como-usar)
-- [Menu Principal](#menu-principal)
-- [Estrutura do Código](#estrutura-do-código)
-- [Limitações Conhecidas](#limitações-conhecidas)
-- [Roteiro de Testes](#roteiro-de-testes)
-- [Autor](#autor)
+> Trabalho acadêmico desenvolvido para a disciplina de Programação — implementação de um sistema CRUD completo em linguagem C, com interface interativa via terminal.
 
 ---
 
-## Sobre o Projeto
+## 👤 Autor
 
-**JARVIS BANK** é um sistema bancário simulado desenvolvido inteiramente em C, executado via terminal. Ao iniciar, o usuário cria um perfil com nome e passa a interagir com o assistente **JARVIS**, que guia todas as operações financeiras: depósitos, saques, transferências, consultas e edição de histórico.
-
-O projeto foi desenvolvido com foco em aprendizado de estruturas em C (`struct`, `enum`, arrays), manipulação de entrada/saída e lógica de validação robusta.
-
----
-
-## Funcionalidades
-
-| Funcionalidade | Descrição |
-|---|---|
-| ✅ Cadastro de usuário | Nome personalizado salvo na sessão |
-| ✅ Depósito | Adiciona valor ao saldo com registro no extrato |
-| ✅ Saque | Retira valor do saldo com validação de saldo disponível |
-| ✅ Transferência | Transfere valor para um destino nomeado |
-| ✅ Consulta de saldo e extrato | Exibe saldo atual e histórico completo de transações |
-| ✅ Pesquisa por ID | Busca uma transação específica pelo seu ID |
-| ✅ Edição de transação | Altera valor e/ou destino de qualquer transação registrada |
-| ✅ Exclusão de registro | Remove uma transação do extrato (sem reverter o saldo) |
-| ✅ Validação de inputs | Trata entradas inválidas, valores zerados e overflow |
+| Nome | GitHub |
+|------|--------|
+| Filipe França | [@filipefranca](https://github.com/filipefranca) |
 
 ---
 
-## Pré-requisitos
+## 🎯 Objetivo
 
-- Compilador C compatível com **C99 ou superior** (ex: GCC, Clang)
-- Terminal (Linux, macOS ou Windows com MinGW/WSL)
-
----
-
-## Como Compilar
-
-```bash
-gcc banco.c -o banco -lm
-```
-
-> A flag `-lm` é necessária por conta do uso de `math.h` (função `fabs`).
-
-Para compilar com avisos ativados (recomendado):
-
-```bash
-gcc banco.c -o banco -lm -Wall -Wextra -std=c99
-```
+Implementar um sistema de cadastro bancário que permita **inserir, consultar, atualizar e remover** registros de transações financeiras, aplicando os conceitos de structs, vetores, enums, estruturas de decisão e repetição em linguagem C.
 
 ---
 
-## Como Usar
+## 🧩 Funcionalidades
 
-Após compilar, execute:
-
-```bash
-./banco
-```
-
-Na inicialização, o JARVIS solicitará seu nome de usuário. Em seguida, o menu principal estará disponível.
-
----
-
-## Menu Principal
+### Menu Principal
 
 ```
 ==========
@@ -89,111 +31,138 @@ Na inicialização, o JARVIS solicitará seu nome de usuário. Em seguida, o men
 2- DEPOSITAR VALOR
 3- SACAR VALOR
 4- TRANSFERIR VALOR
-5- EDITAR TRANSFERENCIA
-6- PESQUISAR TRANSFERENCIA
+5- EDITAR TRANSAÇÃO
+6- PESQUISAR TRANSAÇÃO
 7- SAIR
 ```
 
-### Detalhes de cada opção
+### Operações disponíveis (CRUD)
 
-**1 - Consultar Saldo/Extrato**
-Exibe o saldo atual e, se houver transações, o extrato completo no formato:
-```
-ID    TIPO             VALOR      DESTINO
-0     DEPOSITO         1000.00    João
-1     TRANSFERENCIA    300.00     Maria
-```
-
-**2 - Depositar**
-Solicita um valor positivo e o adiciona ao saldo. O depósito é registrado no extrato com destino igual ao nome do usuário.
-
-**3 - Sacar**
-Solicita um valor e o desconta do saldo, desde que haja saldo suficiente.
-
-**4 - Transferir**
-Solicita o nome do destinatário e o valor. A transação é registrada como `TRANSFERENCIA`.
-
-**5 - Editar Transação**
-Solicita o ID da transação e abre um submenu:
-- `1 - EDITAR`: altera o valor (e o destino, no caso de transferências)
-- `2 - APAGAR`: remove o registro do extrato *(sem reverter o efeito no saldo)*
-- `3 - VOLTAR`: retorna ao menu principal
-
-> ⚠️ Apagar um registro não desfaz a movimentação financeira. Para reverter um saque ou transferência, edite o valor para `0` antes de apagar, ou realize a operação inversa manualmente.
-
-**6 - Pesquisar Transação**
-Localiza e exibe uma transação específica pelo seu ID.
-
-**7 - Sair**
-Encerra o sistema.
+| Operação | Descrição |
+|----------|-----------|
+| **Cadastrar** | Registra depósitos, saques e transferências com ID único |
+| **Listar** | Exibe o extrato completo com todas as transações e saldo atual |
+| **Buscar** | Pesquisa uma transação específica pelo ID |
+| **Atualizar** | Edita o valor e/ou destino de uma transação existente, revertendo o impacto no saldo automaticamente |
+| **Remover** | Apaga o registro do extrato mantendo a consistência do vetor |
 
 ---
 
-## Estrutura do Código
+## 🗂️ Estrutura do Código
 
+O projeto foi implementado **exclusivamente dentro da função `main()`**, conforme requisito da disciplina, com organização lógica feita por meio de `switch`, `while` e `do-while`.
+
+### Tipos de dados utilizados
+
+```c
+// Enum de tipo de transação
+typedef enum { DEPOSITO, SAQUE, TRANSFERENCIA } transacao;
+
+// Struct de cada registro no extrato
+typedef struct {
+    int id;
+    transacao tipo;
+    double valor;
+    char destino[51];
+} historico;
+
+// Struct do usuário
+typedef struct {
+    char nome[51];
+    double saldo;
+    historico extrato[999]; // vetor de até 999 transações
+} user;
 ```
-banco.c
-│
-├── Enums
-│   ├── transacao     → DEPOSITO, SAQUE, TRANSFERENCIA
-│   └── menu          → opções do menu principal (1–7)
-│
-├── Structs
-│   ├── historico     → id, tipo, valor, destino[51]
-│   └── user          → nome[51], saldo, extrato[999]
-│
-└── main()
-    ├── Cadastro do usuário
-    └── Loop do menu principal
-        ├── case CONSULTAR_S
-        ├── case DEPOSITAR
-        ├── case SACAR
-        ├── case TRANSFERIR
-        ├── case EDITAR_T  →  submenu (EDITAR / APAGAR / VOLTAR)
-        ├── case PESQUISAR
-        └── case SAIR
-```
+
+### Controle de registros
+
+- `id_transacao` — quantidade atual de transações cadastradas
+- `proximo_id` — ID único auto-incrementado para cada nova transação
+- Remoção mantém consistência do vetor via shift dos elementos
 
 ---
 
-## Limitações Conhecidas
+## ✅ Validações implementadas
 
-| Limitação | Descrição |
-|---|---|
-| Sem persistência | Todos os dados são perdidos ao encerrar o programa |
-| Apenas um usuário | O sistema suporta somente uma conta por sessão |
-| Máximo de 999 transações | Limite fixo definido em tempo de compilação |
-| Sem criptografia | Nenhuma camada de segurança nos dados |
-| IDs não reutilizados | Ao apagar uma transação, o ID dela não é reaproveitado |
+- Nome de usuário não pode ser vazio
+- Valores de depósito, saque e transferência devem ser maiores que zero
+- Saldo insuficiente é detectado antes de executar saque ou transferência
+- Overflow de saldo é verificado contra `DBL_MAX`
+- Entradas não numéricas no menu são tratadas sem travar o programa
+- IDs inexistentes retornam mensagem de erro clara
+- Limite de 999 transações é verificado antes de cada cadastro
 
 ---
 
-## Roteiro de Testes
+## ⚙️ Como compilar e executar
 
-Sequência sugerida para validar todas as funcionalidades:
+### Pré-requisitos
 
+- GCC instalado (`gcc --version` para verificar)
+- Sistema operacional: Linux, macOS ou Windows (com MinGW)
+
+### Compilação
+
+```bash
+gcc -o jarvis_bank main.c -lm
 ```
-1.  Nome: João
-2.  Depositar: 1000        → saldo: 1000.00
-3.  Depositar: 500         → saldo: 1500.00
-4.  Consultar              → extrato com 2 transações (ID 0 e 1)
-5.  Sacar: 200             → saldo: 1300.00
-6.  Transferir: Maria/300  → saldo: 1000.00
-7.  Transferir: Pedro/1500 → SALDO INSUFICIENTE
-8.  Editar ID 0 → valor 800   → saldo: 800.00
-9.  Editar ID 3 → valor 100, destino Ana → saldo: 1000.00
-10. Pesquisar ID 2         → exibe saque de 200
-11. Pesquisar ID 99        → não registrado
-12. Depositar: 0           → rejeitado
-13. Sacar: -50             → tratado como 50 (fabs)
-14. Digitar "abc" no menu  → OPÇÃO INVÁLIDA
-15. Apagar ID 1            → consultar e confirmar remoção
+
+> A flag `-lm` é necessária para linkar a biblioteca `math.h` (usada pela função `fabs()`).
+
+### Execução
+
+```bash
+./jarvis_bank
+```
+
+No Windows:
+```bash
+jarvis_bank.exe
 ```
 
 ---
 
-## Autor
+## 🧪 Roteiro de testes sugerido
 
-Desenvolvido como projeto de estudo em C.
+| Passo | Ação | Resultado esperado |
+|-------|------|--------------------|
+| 1 | Depositar `1000` | Saldo: 1000.00 |
+| 2 | Depositar `500` | Saldo: 1500.00 |
+| 3 | Sacar `200` | Saldo: 1300.00 |
+| 4 | Transferir `300` para `Maria` | Saldo: 1000.00 |
+| 5 | Transferir `1500` para `Pedro` | SALDO INSUFICIENTE |
+| 6 | Pesquisar ID `2` | Exibe o saque de 200 |
+| 7 | Pesquisar ID `99` | Transação não registrada |
+| 8 | Editar ID `0`, novo valor `800` | Saldo ajustado automaticamente |
+| 9 | Apagar ID `1` | Registro removido do extrato |
+| 10 | Digitar `abc` no menu | OPÇÃO INVÁLIDA, programa continua |
 
-Contribuições, sugestões e issues são bem-vindas!
+---
+
+## 📁 Estrutura do repositório
+
+```
+📦 jarvis-bank/
+├── main.c        # Código-fonte completo
+└── README.md     # Documentação do projeto
+```
+
+---
+
+## 📋 Requisitos atendidos
+
+- [x] Código exclusivamente na função `main()`
+- [x] Menu interativo com opções numéricas
+- [x] Programa permanece em execução até o usuário sair
+- [x] CRUD completo: cadastrar, listar, buscar, atualizar e remover
+- [x] Identificador único validado automaticamente (auto-incremento)
+- [x] Todas as entradas validadas
+- [x] Uso de `struct` personalizada
+- [x] Vetor de estruturas com controle de quantidade de registros
+- [x] Remoção mantém consistência do vetor
+
+---
+
+## 📜 Licença
+
+Projeto acadêmico — uso educacional.
