@@ -8,7 +8,7 @@
 
 | Nome | GitHub |
 |------|--------|
-| Filipe França | [@filipefranca](https://github.com/filipefranca) |
+| Filipe França | [@filipefranca](https://github.com/Filiperfranca/) |
 
 ---
 
