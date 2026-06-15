@@ -10,7 +10,7 @@ int main (void) {
     DEPOSITO,
     SAQUE,
     TRANSFERENCIA
-    } transacao;
+    } transacao; // Enum para categorização de transação
 
     typedef struct {
         int id;
@@ -18,18 +18,18 @@ int main (void) {
         double valor;
         char destino[51];
 
-    } historico;
+    } historico; // Padrão de extrato de conta
 
     typedef struct {
         char nome[51];
         double saldo;
         historico extrato[999];
 
-    } user;
+    } user; // padrão de usuário, futuramente pode ser expandido para mais de um
 
 
-    user one;
-    one.saldo = 0;
+    user one; // usuário padrão
+    one.saldo = 0; // saldo 0 para início do main
     
     printf("=================\n");
     printf("   BEM VINDO\n");
@@ -40,9 +40,9 @@ int main (void) {
     printf("          USERNAME:");
     while (1)
     {
-        fgets(one.nome, sizeof(one.nome), stdin);
-        one.nome[strcspn(one.nome, "\n")] = '\0';
-        if (strlen(one.nome) == 0)
+        fgets(one.nome, sizeof(one.nome), stdin); // definir nome de usuário
+        one.nome[strcspn(one.nome, "\n")] = '\0'; // remover \n do final da string
+        if (strlen(one.nome) == 0) // tratamento de dados, caso não tenha nenhum caractere na string
         {
             printf("<JARVIS>: Opa, parece que nada foi digi-");
             printf("          tado, tente novamente\n");
@@ -66,13 +66,14 @@ int main (void) {
         EDITAR_T,
         PESQUISAR,
         SAIR
-    } menu;
+    } menu; // menu
 
-    int opcao;
-    int id_transacao = 0;
-    int id_pesquisa;
-    int proximo_id = 0;
-
+    int opcao; //para o usuário escolher o menu
+    int id_transacao = 0; // qual a transação atual
+    int id_pesquisa; // para a função de pesquisar do programa. buscando por id
+    int proximo_id = 0; // caso o usuário apague uma transação, o "id_transacao" não repitir
+    /* interessante observar que: id_transacao mostra a quantidade exata de transações
+        mas proximo_id configura o vetor de registro de cada transacao*/
     do
     {
         printf("==========\n");
@@ -89,11 +90,11 @@ int main (void) {
         printf("6- PESQUISAR TRANSFERENCIA\n");
         printf("7- sair\n");
         printf("Digite sua opcao:");
-        if (scanf("%i", &opcao) != 1) {
+        if (scanf("%i", &opcao) != 1) { // tratamnto, se != 1 siginifica que não é número digitado
             printf("OPCAO INVALIDA\n");
-            while (getchar() != '\n');
+            while (getchar() != '\n'); // limpeza de buffer para não dar erro na próxima entrada de dados
             printf("\n");
-            continue;
+            continue; // caso de errado, ele volta pro inicio do looping
         }
         while (getchar() != '\n');
         switch (opcao)
@@ -105,13 +106,13 @@ int main (void) {
             if (id_transacao == 0) {
                 printf("<JARVIS>: Nenhuma transacao registrada.\n\n");
                 break;
-            }
+            } // caso não haja ainda transação
             printf("<JARVIS>: Seu extrato:\n");
             printf("ID    TIPO    VALOR    DESTINO\n");
-            for (int i = 0; i < id_transacao; i++) {
-                char *tipo;
+            for (int i = 0; i < id_transacao; i++) { //looping pra impressão de todas as transações
+                char *tipo; // ponteiro de char para criação de string sem array
 
-                switch (one.extrato[i].tipo)
+                switch (one.extrato[i].tipo) // para facilitar ao usuário, define em texto o valor
                 {
                     case DEPOSITO:
                         tipo = "DEPOSITO";
@@ -134,7 +135,7 @@ int main (void) {
             printf("\n");
             break;
         case TRANSFERIR:
-            if (id_transacao >= 999) {
+            if (id_transacao >= 999) { // limite máximo de 999 transações
             printf("LIMITE DE TRANSACOES ATINGIDO\n");
             break;
             }
@@ -144,19 +145,21 @@ int main (void) {
             printf("          DESTINO:");
             fgets(one.extrato[id_transacao].destino, sizeof(one.extrato[id_transacao].destino), stdin);
             one.extrato[id_transacao].destino[strcspn(one.extrato[id_transacao].destino, "\n")] = '\0';
+            /*grande trecho, mas o primeiro, linha 46 recebe o dado para trasnferecnia e 147 limpa o \n*/
             printf("\n");
             printf("<JARVIS>: informe o valor a ser trans-\n");
             printf("          ferido\n");
             printf("          VALOR:");
-            if(scanf("%lf", &one.extrato[id_transacao].valor) != 1){
+            if(scanf("%lf", &one.extrato[id_transacao].valor) != 1){ // novamente verificador de somente digito
                 printf("\n");
                 printf("<JARVIS>: Opa, digite corretamente\n");
                 while (getchar() != '\n');
                 break;
             }
-            while (getchar() != '\n');
-            one.extrato[id_transacao].valor = fabs(one.extrato[id_transacao].valor);
-            if (one.extrato[id_transacao].valor == 0)
+            while (getchar() != '\n'); // novamente limpar buffer
+            one.extrato[id_transacao].valor = fabs(one.extrato[id_transacao].valor); 
+            /*tratamento de dados para somente valores positivos, evitando que uma transferencia gere depósito*/
+            if (one.extrato[id_transacao].valor == 0) //evitar registro de valores zerados
             {
                 printf("\n");
                 printf("<JARVIS>: TRANSFIRA UM VALOR MAIOR QUE 0\n");
@@ -169,8 +172,10 @@ int main (void) {
                 one.extrato[id_transacao].id = proximo_id;
                 id_transacao++;
                 proximo_id++;
+                /*depois de todas as verificações as mudanças e registros são aplicados
+                evita com certeza ter que tratar retorno de dados ao original*/
             }
-            else {
+            else { // se não é igual a zero, se não é menor que o saldo, só pode ser maior nessa situação
                 printf("\n");
                 printf("<JARVIS>: SALDO INSUFICIENTE\n");
             }
@@ -185,27 +190,27 @@ int main (void) {
             printf("<JARVIS>: Informe o valor a se de-\n");
             printf("          positar\n");
             printf("          VALOR:");
-            if(scanf("%lf", &one.extrato[id_transacao].valor) != 1){
+            if(scanf("%lf", &one.extrato[id_transacao].valor) != 1){ // outro tramento de exclusividade inteiro
                 printf("\n");
                 printf("<JARVIS>: Opa, digite corretamente\n");
-                while (getchar() != '\n');
+                while (getchar() != '\n'); 
                 break;
             }
             while (getchar() != '\n');
             one.extrato[id_transacao].valor = fabs(one.extrato[id_transacao].valor);
-            if (one.extrato[id_transacao].valor != 0)
+            if (one.extrato[id_transacao].valor != 0) //como fabs aplicado, então só poder valor positivo
             {
-                if (one.saldo + one.extrato[id_transacao].valor > DBL_MAX) {
+                if (one.extrato[id_transacao].valor > DBL_MAX - one.saldo) { // caso passe da capacidade de um double
                     printf("<JARVIS>: Opa, ta com pacote grande demais pae\n");
                     printf("          , insira um valor menor\n");
-                    one.extrato[id_transacao].valor = 0;
+                    one.extrato[id_transacao].valor = 0; // zera o valor dessa transação
                     break;
                 }
                 one.saldo += one.extrato[id_transacao].valor;
                 printf("\n");
                 printf("<JARVIS>: DEPOSITO REALIZADO\n");
                 one.extrato[id_transacao].tipo = DEPOSITO;
-                strcpy(one.extrato[id_transacao].destino, one.nome);
+                strcpy(one.extrato[id_transacao].destino, one.nome); // como o depósito sempre é feito para você mesmo, ele repete o destino
                 printf("\n");
                 one.extrato[id_transacao].id = proximo_id;
                 id_transacao++;
@@ -234,14 +239,14 @@ int main (void) {
                 break;
             }
             while (getchar() != '\n');
-            one.extrato[id_transacao].valor = fabs(one.extrato[id_transacao].valor);
+            one.extrato[id_transacao].valor = fabs(one.extrato[id_transacao].valor); // novamente tratamento de dados para positivo
             if (one.extrato[id_transacao].valor == 0)
             {
                 printf("\n");
                 printf("<JARVIS>: SAQUE UM VALOR MAIOR QUE 0\n");
             }
             
-            else if (one.extrato[id_transacao].valor <= one.saldo)
+            else if (one.extrato[id_transacao].valor <= one.saldo) // a lógica é simples, para todas as vezes que aparece, não deixar passar um valor maior do que o user tem
             {
                 printf("\n");
                 printf("<JARVIS>: SAQUE REALIZADO\n");
@@ -269,7 +274,7 @@ int main (void) {
                 while (getchar() != '\n');
                 break;
             }
-            int indice = -1;
+            int indice = -1; // existe id 0, se não encontrar, não pode devolver 0
 
             for (int i = 0; i < id_transacao; i++)
             {
@@ -285,8 +290,8 @@ int main (void) {
                 break;
             }
 
-            else {
-                char *tipo;
+            else { // isso é, qualquer valor definido do if do for maior que -1
+                char *tipo; //repetição do padrão de impressão de consulta
                 switch (one.extrato[indice].tipo)
                 {
                     case DEPOSITO:
@@ -323,7 +328,9 @@ int main (void) {
                 break;
             }
             while (getchar() != '\n');
-            id_pesquisa = abs(id_pesquisa);
+            /* interessante pontuar que não há tratamento fabs
+            com a pesquisa do id pois é valor específico exato, retorno de
+            transação não encontrada*/
             
             typedef enum {
                 EDITAR=1,
@@ -355,7 +362,7 @@ int main (void) {
 
                 int indice = -1;
 
-                for (int i = 0; i < id_transacao; i++)
+                for (int i = 0; i < id_transacao; i++) // verificação como na pesquisa
                 {
                     if (one.extrato[i].id == id_pesquisa)
                     {
@@ -377,7 +384,7 @@ int main (void) {
                             printf("<JARVIS>: Edite este saque infor-\n");
                             printf("          me o valor\n");
                             printf("          VALOR:");
-                            double temp;
+                            double temp; // para trabalharmos sem perder valor
                             if (scanf("%lf", &temp) != 1)
                             {
                                 printf("\n");
@@ -386,28 +393,33 @@ int main (void) {
                                 break;
                             }
                             while (getchar() != '\n');
-                            temp = fabs(temp);
-                            one.saldo += one.extrato[indice].valor;
+                            if (temp <= 0)
+                            {
+                                printf("<JARVIS>: Digite um valor maior que 0\n");
+                                break;
+                            }
+                            temp = fabs(temp); // como na transferencia original, não pode haver valor negativo
+                            one.saldo += one.extrato[indice].valor; // extorno do valor original
                             if (temp <= one.saldo)
                             {
                                 printf("\n");
                                 printf("<JARVIS>: SAQUE MODIFICADO\n");
-                                one.saldo -= temp;
-                                one.extrato[indice].valor = temp;
+                                one.saldo -= temp; // remoção do novo valor a ser sacado
+                                one.extrato[indice].valor = temp; // define o valor no histórico
                                 printf("\n");
                                 break;
                             }
                             else {
                                 printf("\n");
                                 printf("<JARVIS>: SALDO INSUFICIENTE\n");
-                                one.saldo -= one.extrato[indice].valor;
+                                one.saldo -= one.extrato[indice].valor; // o valor extornado é novamente retirado
                                 printf("\n");
                                 break;
                             }
                             
                             
                         }
-                        else if (one.extrato[indice].tipo == TRANSFERENCIA) {
+                        else if (one.extrato[indice].tipo == TRANSFERENCIA) { // se for editado a transferencia
                             printf("<JARVIS>: Edite essa transferencia\n");
                             printf("          informe o valor\n");
                             printf("          VALOR:");
@@ -419,14 +431,14 @@ int main (void) {
                                 break;
                             }
                             while (getchar() != '\n');
-                            temp = fabs(temp);
-                            one.saldo += one.extrato[indice].valor;
+                            temp = fabs(temp); // tratamento pra valor positivo, memso motivo, não ocorrencia d edeposito como transferencia
+                            one.saldo += one.extrato[indice].valor; // extorno do valor
                             if (temp <= one.saldo)
                             {
                                 printf("\n");
                                 printf("<JARVIS>: TRANSFERENCIA MODIFICADA\n");
-                                one.saldo -= temp;
-                                one.extrato[indice].valor = temp;
+                                one.saldo -= temp; // atualização de valores como no saque
+                                one.extrato[indice].valor = temp; // atualização de extrato
                                 printf("\n");
                             }
                             else {
@@ -442,6 +454,7 @@ int main (void) {
                             printf("          DESTINO:");
                             fgets(one.extrato[indice].destino, sizeof(one.extrato[indice].destino), stdin);
                             one.extrato[indice].destino[strcspn(one.extrato[indice].destino, "\n")] = '\0';
+                            /* atualização de registro do destinatário, sempre atualizando o id informado*/
                             printf("\n");
                             printf("<JARVIS>: TRANSFERENCIA MODIFICADA!\n");
                             break;
@@ -460,11 +473,11 @@ int main (void) {
                             }
                             while (getchar() != '\n');
                             temp = fabs(temp);
-                            if (one.saldo - one.extrato[indice].valor + temp > DBL_MAX) {
+                            if ( temp > DBL_MAX - one.saldo - one.extrato[indice].valor) {
                                 printf("<JARVIS>: Opa, ta com pacote grande demais pae\n");
                                 printf("          , insira um valor menor\n");
                                 break;
-                            }
+                            } // novamente o trato de overflow
 
                             if (temp <= 0)
                             {
@@ -480,11 +493,12 @@ int main (void) {
                                 printf("<JARVIS>: DEPÓSITO MODIFICADO!\n");
                                 printf("\n");
                                 break;
+                                // se tá positivo, maior que 0, logo, tá válido
                             }
                             break;
                             
                         }
-                        break;
+                        break; // esse break é para EDITAR_T
                     case APAGAR:
                         printf("<JARVIS>: AVISO!!!!\n");
                         printf("          Apagar uma transação não anula\n");
@@ -502,14 +516,15 @@ int main (void) {
                                 while (getchar() != '\n');
                                 break;
                         }
+                        while (getchar() != '\n');
 
                         if (escolha == 1) {
                             printf("<JARVIS>: TRANSAÇÃO APAGADA!\n");
                             printf("\n");
-                            id_transacao--;
-                            for (int i = indice; i < id_transacao; i++)
+                            id_transacao--; // diminui um valor da existencia de transações
+                            for (int i = indice; i < id_transacao; i++) // edita a partir do valor removido: "indice"
                             {
-                                one.extrato[i] = one.extrato[i + 1];
+                                one.extrato[i] = one.extrato[i + 1]; // valor anterior igual o próximo
                             }
                             break;
                         }
